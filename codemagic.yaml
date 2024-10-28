@@ -1,0 +1,26 @@
+workflows:
+  ios-release:
+    name: iOS Release Workflow
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    cache:
+      cache_paths:
+        - ~/.pub-cache
+        - ~/Library/Caches/CocoaPods
+    triggering:
+      events:
+        - push
+    scripts:
+      - name: Flutter Clean
+        script: flutter clean
+      - name: Install Dependencies
+        script: flutter pub get
+      - name: Build iOS
+        script: flutter build ios --release --no-codesign
+      - name: Build IPA
+        script: xcodebuild -exportArchive -archivePath build/ios/archive/MyApp.xcarchive -exportOptionsPlist build/ios/exportOptions.plist -exportPath build/ios/ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
